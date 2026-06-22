@@ -1,14 +1,16 @@
+import Router from "./router/Router";
+
+
 
 
 function App() {
-
   return (
     <>
-     <h1>
-      e-commerce
-     </h1>
+      <div>
+      <Router/>
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
