@@ -18,7 +18,7 @@ const ErrorPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 gap-3">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-950 text-gray-100 gap-3">
       <h1 className="text-8xl font-bold text-cyan-600">{errorStatus}</h1>
       <p className="text-red-500 text-lg">{errorStatusText}</p>
       <div className="flex gap-1">
