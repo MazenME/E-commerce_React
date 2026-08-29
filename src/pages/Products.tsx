@@ -5,6 +5,7 @@ import getProducts from "@/store/actions/getProducts";
 import { useParams } from "react-router-dom";
 import { productsCleanUp } from "@/store/products/productsSlice";
 import Loading from "@/components/feedback/loading/Loading";
+import GridList from "@/components/common/GridList/GridList";
 
 const Products = () => {
   const dispatch = useAppDispatch();
@@ -19,10 +20,6 @@ const Products = () => {
       dispatch(productsCleanUp());
     };
   }, [dispatch, prefix]);
-
-  const products = records?.map((record) => {
-    return <Product key={record.id} product={record} />;
-  });
 
   const productSkeleton = (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 my-7">
@@ -62,13 +59,21 @@ const Products = () => {
       <Loading loading={loading} error={error} skeleton={productSkeleton}>
         {records?.length === 0 ? (
           <div className="py-16 text-center text-gray-400 bg-gray-900/20 border border-gray-800/80 rounded-2xl">
-            <p className="text-lg font-semibold text-gray-300">No products found</p>
-            <p className="text-sm text-gray-500 mt-1">There are no items available in this collection.</p>
+            <p className="text-lg font-semibold text-gray-300">
+              No products found
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              There are no items available in this collection.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 my-7">
-            {products}
-          </div>
+          <GridList
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 my-7"
+            records={records}
+            renderItems={(record) => (
+              <Product product={record} />
+            )}
+          />
         )}
       </Loading>
     </div>

@@ -3,6 +3,7 @@ import getCategories from "@/store/actions/getCategories";
 import { useEffect } from "react";
 import Category from "@/components/e-commerce/Categories/Category";
 import Loading from "@/components/feedback/loading/Loading";
+import GridList from "@/components/common/GridList/GridList";
 
 const Categories = () => {
   const dispatch = useAppDispatch();
@@ -18,9 +19,6 @@ const Categories = () => {
     };
   }, [dispatch, records.length]);
 
-  const categories = records?.map((record) => {
-    return <Category key={record.id} category={record} />;
-  });
 
   const categorySkeleton = (
     <div className="flex items-center justify-center gap-5 flex-wrap my-7">
@@ -42,9 +40,10 @@ const Categories = () => {
             <p className="text-sm text-gray-500 mt-1">There are no categories available at the moment.</p>
           </div>
         ) : (
-          <div className="flex items-center justify-center gap-5 flex-wrap my-7">
-            {categories}
-          </div>
+            <GridList
+            className="flex items-center justify-center gap-5 flex-wrap my-7"
+            records={records} renderItems={(record) => <Category category={record} />} />
+
         )}
       </Loading>
     </div>
