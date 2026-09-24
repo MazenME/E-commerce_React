@@ -5,6 +5,17 @@ import Category from "@/components/e-commerce/Categories/Category";
 import Loading from "@/components/feedback/loading/Loading";
 import GridList from "@/components/common/GridList/GridList";
 
+const categorySkeleton = (
+  <div className="flex items-center justify-center gap-5 flex-wrap my-7">
+    {Array.from({ length: 6 }).map((_, idx) => (
+      <div key={idx} className="flex flex-col items-center p-2 rounded-xl animate-pulse space-y-2">
+        <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-800/60 rounded-full" />
+        <div className="h-5 w-24 bg-gray-800/60 rounded" />
+      </div>
+    ))}
+  </div>
+);
+
 const Categories = () => {
   const dispatch = useAppDispatch();
   const { error, loading, records } = useAppSelector(
@@ -12,24 +23,12 @@ const Categories = () => {
   );
 
   useEffect(() => {
-    const promise = !records.length ? dispatch(getCategories()) : null;
+    const promise = !records.length && loading === "idle" ? dispatch(getCategories()) : null;
 
     return () => {
       promise?.abort();
     };
-  }, [dispatch, records.length]);
-
-
-  const categorySkeleton = (
-    <div className="flex items-center justify-center gap-5 flex-wrap my-7">
-      {Array.from({ length: 6 }).map((_, idx) => (
-        <div key={idx} className="flex flex-col items-center p-2 rounded-xl animate-pulse space-y-2">
-          <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-800/60 rounded-full" />
-          <div className="h-5 w-24 bg-gray-800/60 rounded" />
-        </div>
-      ))}
-    </div>
-  );
+  }, [dispatch, records.length, loading]);
 
   return (
     <div className="mx-5 my-5">

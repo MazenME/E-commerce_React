@@ -63,10 +63,15 @@ const HomePage = () => {
   );
 
   useEffect(() => {
-    if (categories.length === 0) {
-      dispatch(getCategories());
-    }
-  }, [dispatch, categories.length]);
+    const promise =
+      categories.length === 0 && categoriesLoading === "idle"
+        ? dispatch(getCategories())
+        : null;
+
+    return () => {
+      promise?.abort();
+    };
+  }, [dispatch, categories.length, categoriesLoading]);
 
   return (
     <div className="space-y-20 pb-20">

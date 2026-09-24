@@ -39,6 +39,7 @@ export type TProduct = {
   brand: string;
   isNew: boolean;
   featured: boolean;
+  quantity?: number;
 };
 
 export type TLoadingStatus = "idle" | "pending" | "succeeded" | "rejected";

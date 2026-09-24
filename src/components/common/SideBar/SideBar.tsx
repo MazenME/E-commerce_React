@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, memo } from "react";
 import { useLocation } from "react-router-dom";
 import { Search, SlidersHorizontal, Star, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -9,7 +9,7 @@ interface SideBarProps {
   onClose: () => void;
 }
 
-const SideBar = ({ isOpen, onClose }: SideBarProps) => {
+const SideBar = memo(({ isOpen, onClose }: SideBarProps) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   
@@ -146,6 +146,6 @@ const SideBar = ({ isOpen, onClose }: SideBarProps) => {
       </button>
     </aside>
   );
-};
+});
 
 export default SideBar;

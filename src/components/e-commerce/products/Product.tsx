@@ -1,13 +1,17 @@
 import { memo } from "react";
 import type { TProduct } from "@/types/types";
 import { Star, ShoppingCart } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { addToCart } from "@/store/cart/cartSlice";
 
 interface ProductProps {
   product: TProduct;
+  onAddToCart?: (id: number) => void;
 }
 
-const Product = memo(({ product }: ProductProps) => {
+const Product = memo(({ product, onAddToCart }: ProductProps) => {
   const {
+    id,
     title,
     price,
     img,
@@ -17,7 +21,21 @@ const Product = memo(({ product }: ProductProps) => {
     discount,
     brand,
     isNew,
+    stock,
   } = product;
+
+  const dispatch = useAppDispatch();
+  const currentQuantity = useAppSelector((state) => state.cart.cartItems[id]);
+
+  const handleButtonClick = () => {
+    if (typeof onAddToCart === "function") {
+      onAddToCart(id);
+    } else {
+      dispatch(addToCart({ id }));
+    }
+  };
+
+  const isOutOfStock = currentQuantity >= stock;
 
   const numericPrice = parseFloat(price);
   const hasDiscount = discount > 0;
@@ -102,7 +120,15 @@ const Product = memo(({ product }: ProductProps) => {
               </span>
             )}
           </div>
-          <button className="flex items-center justify-center p-2.5 bg-gray-800 hover:bg-cyan-500 text-cyan-400 hover:text-white rounded-xl transition-all shadow-md active:scale-95 cursor-pointer duration-300">
+          <button
+            className={`flex items-center justify-center p-2.5 ${
+              isOutOfStock
+                ? "bg-gray-950 cursor-not-allowed opacity-50"
+                : "bg-gray-800 hover:bg-cyan-500 text-cyan-400 hover:text-white rounded-xl transition-all shadow-md active:scale-95 cursor-pointer duration-300"
+            }`}
+            onClick={handleButtonClick}
+            disabled={isOutOfStock} 
+          >
             <ShoppingCart className="w-4.5 h-4.5" />
           </button>
         </div>
