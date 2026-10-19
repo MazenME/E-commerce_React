@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import type { TProduct } from "@/types/types";
 import { Star, ShoppingCart } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -25,9 +25,17 @@ const Product = memo(({ product, onAddToCart }: ProductProps) => {
   } = product;
 
   const dispatch = useAppDispatch();
-  const currentQuantity = useAppSelector((state) => state.cart.cartItems[id]);
+  const currentQuantity = useAppSelector((state) => state.cart.cartItems[id] || 0);
+  const [isBtnDisabled, setIsBtnDisabled] = useState(false);
+
+  const remainingStock = Math.max(0, stock - currentQuantity);
+  const isOutOfStock = remainingStock <= 0;
 
   const handleButtonClick = () => {
+    if (isBtnDisabled || isOutOfStock) return;
+
+    setIsBtnDisabled(true);
+
     if (typeof onAddToCart === "function") {
       onAddToCart(id);
     } else {
@@ -35,7 +43,15 @@ const Product = memo(({ product, onAddToCart }: ProductProps) => {
     }
   };
 
-  const isOutOfStock = currentQuantity >= stock;
+  useEffect(() => {
+    if (!isBtnDisabled) return;
+
+    const timer = setTimeout(() => {
+      setIsBtnDisabled(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [isBtnDisabled]);
 
   const numericPrice = parseFloat(price);
   const hasDiscount = discount > 0;
@@ -102,8 +118,28 @@ const Product = memo(({ product, onAddToCart }: ProductProps) => {
           <span className="text-gray-500">({reviews} reviews)</span>
         </div>
 
+        {/* Stock Status */}
+        <div className="flex items-center justify-between text-xs pt-1.5 pb-0.5 border-t border-gray-800/60">
+          <span className="text-gray-400 font-medium">In Stock:</span>
+          {remainingStock > 0 ? (
+            <span
+              className={`font-semibold tracking-wide transition-colors duration-200 ${
+                remainingStock <= 3 ? "text-amber-400" : "text-emerald-400"
+              }`}
+            >
+              {remainingStock <= 3
+                ? `Only ${remainingStock} ${remainingStock === 1 ? "piece" : "pieces"} left!`
+                : `${remainingStock} ${remainingStock === 1 ? "piece" : "pieces"}`}
+            </span>
+          ) : (
+            <span className="font-semibold text-rose-500 tracking-wide">
+              Out of stock
+            </span>
+          )}
+        </div>
+
         {/* Price & Cart CTA */}
-        <div className="flex items-center justify-between pt-3 mt-auto">
+        <div className="flex items-center justify-between pt-2 mt-auto">
           <div className="flex flex-col">
             {hasDiscount ? (
               <>
@@ -121,15 +157,21 @@ const Product = memo(({ product, onAddToCart }: ProductProps) => {
             )}
           </div>
           <button
-            className={`flex items-center justify-center p-2.5 ${
+            className={`flex items-center justify-center p-2.5 rounded-xl transition-all duration-300 shadow-md ${
               isOutOfStock
-                ? "bg-gray-950 cursor-not-allowed opacity-50"
-                : "bg-gray-800 hover:bg-cyan-500 text-cyan-400 hover:text-white rounded-xl transition-all shadow-md active:scale-95 cursor-pointer duration-300"
+                ? "bg-gray-950 cursor-not-allowed opacity-50 text-gray-600"
+                : isBtnDisabled
+                ? "bg-cyan-500 text-white scale-90 shadow-cyan-500/50 cursor-not-allowed"
+                : "bg-gray-800 hover:bg-cyan-500 text-cyan-400 hover:text-white active:scale-95 cursor-pointer"
             }`}
             onClick={handleButtonClick}
-            disabled={isOutOfStock} 
+            disabled={isOutOfStock || isBtnDisabled}
           >
-            <ShoppingCart className="w-4.5 h-4.5" />
+            <ShoppingCart
+              className={`w-4.5 h-4.5 transition-transform duration-300 ${
+                isBtnDisabled ? "scale-110" : ""
+              }`}
+            />
           </button>
         </div>
       </div>
