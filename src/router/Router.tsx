@@ -8,6 +8,7 @@ const Categories = lazy(() => import("@/pages/Categories"));
 const Products = lazy(() => import("@/pages/Products"));
 const Login = lazy(() => import("@/pages/Login"));
 const Register = lazy(() => import("@/pages/Register"));
+const Cart = lazy(() => import("@/pages/Cart"));
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "products", 
         element: <Products />,
+      },
+      {
+        path: "cart", 
+        element: <Cart />,
       },
       {
         path: "products/:prefix", 

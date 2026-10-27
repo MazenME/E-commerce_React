@@ -1,32 +1,47 @@
 // src/store/store.ts
-import { configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
 import categoriesReducer from "./categories/categoriesSlice";
 import productsReducer from "./products/productsSlice";
 import cartReducer from "./cart/cartSlice";
 
-// 1. Create the listener middleware
-const listenerMiddleware = createListenerMiddleware();
+// 1. Root reducer combining all slice reducers
+export const rootReducer = combineReducers({
+  categories: categoriesReducer,
+  products: productsReducer,
+  cart: cartReducer,
+});
 
-// 2. Automatically listen to any action starting with "cart/" (addToCart, removeItem, etc.)
+// 2. Create listener middleware for side-effects
+export const listenerMiddleware = createListenerMiddleware();
+
 listenerMiddleware.startListening({
   predicate: (action) => action.type.startsWith("cart/"),
   effect: (_action, listenerApi) => {
     const state = listenerApi.getState() as RootState;
-    localStorage.setItem("cartItems", JSON.stringify(state.cart.cartItems));
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cartItems", JSON.stringify(state.cart.cartItems));
+      }
+    } catch (error) {
+      console.error("Failed to save cartItems to localStorage:", error);
+    }
   },
 });
 
-// 3. Configure the store
-export const store = configureStore({
-  reducer: {
-    categories: categoriesReducer,
-    products: productsReducer,
-    cart: cartReducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
-});
+// 3. Factory function to create a new store instance (essential for tests)
+export const setupStore = (preloadedState?: Partial<RootState>) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+  });
+};
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+// 4. Singleton store for the live application
+export const store = setupStore();
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppStore = ReturnType<typeof setupStore>;
+export type AppDispatch = AppStore["dispatch"];
 export default store;

@@ -2,6 +2,7 @@ import { memo, useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import { getTotalQuantity } from "@/store/selectors";
+import { Link } from "react-router-dom";
 
 const HeaderCart = memo(() => {
   const count = useAppSelector(getTotalQuantity);
@@ -24,6 +25,7 @@ const HeaderCart = memo(() => {
         isPumping ? "scale-125" : "scale-100"
       }`}
     >
+      <Link to="/cart">
       <ShoppingCart
         className={`w-7 h-7 text-cyan-600 cursor-pointer transition-colors duration-200 ${
           isPumping ? "text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" : ""
@@ -36,6 +38,7 @@ const HeaderCart = memo(() => {
       >
         {count}
       </span>
+      </Link>
     </div>
   );
 });
