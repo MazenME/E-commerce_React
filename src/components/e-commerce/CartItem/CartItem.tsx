@@ -28,6 +28,7 @@ const CartItem = memo(
       }
     };
 
+    console.log("rendering check")
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 bg-gray-900/50 border border-gray-800/80 hover:border-gray-700/80 rounded-2xl transition-all duration-300 shadow-lg w-full">
         {/* Left: Product Image & Details */}

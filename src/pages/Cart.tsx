@@ -1,11 +1,11 @@
 import CartItem from "@/components/e-commerce/CartItem/CartItem";
 import Loading from "@/components/feedback/loading/Loading";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import getCartProducts from "@/store/actions/getCartProducts";
 import { ShoppingCart, ArrowLeft, Tag, PackageX } from "lucide-react";
 import { Link } from "react-router-dom";
-import { changeQuantity, removeFromCart } from "@/store/cart/cartSlice";  
+import { changeQuantity, removeFromCart } from "@/store/cart/cartSlice";
 
 /* ─── Skeleton for a single cart row ───────────────────────────────────── */
 const CartItemSkeleton = () => (
@@ -27,22 +27,33 @@ const CartItemSkeleton = () => (
 const Cart = () => {
   const dispatch = useAppDispatch();
   const { cartItems, productInfo, loading, error } = useAppSelector(
-    (state) => state.cart
+    (state) => state.cart,
   );
 
   const cartCount = Object.keys(cartItems).length;
 
   useEffect(() => {
+    if (
+      productInfo.length === Object.keys(cartItems).length &&
+      productInfo.length > 0
+    )
+      return;
     dispatch(getCartProducts());
   }, [dispatch, cartItems]);
 
-  const handleChangeQuantity = (id: number, quantity: number) => {
+  const handleChangeQuantity = useCallback(
+  (id: number, quantity: number) => {
     dispatch(changeQuantity({ id, quantity }));
-  };
-
-  const handleRemoveItem = (id: number) => {
+  },
+  [dispatch]
+);
+const handleRemoveItem = useCallback(
+  (id: number) => {
     dispatch(removeFromCart({ id }));
-  };
+  },
+  [dispatch]
+);
+
 
   /* ─── Order totals ─────────────────────────────────────────────────── */
   const { subtotal, totalSavings } = useMemo(() => {
@@ -52,7 +63,8 @@ const Cart = () => {
     productInfo.forEach((product) => {
       const qty = cartItems[product.id] ?? 0;
       const price = parseFloat(product.price);
-      const saving = product.discount > 0 ? (price * product.discount) / 100 : 0;
+      const saving =
+        product.discount > 0 ? (price * product.discount) / 100 : 0;
       const finalPrice = price - saving;
       subtotal += finalPrice * qty;
       totalSavings += saving * qty;
@@ -72,7 +84,6 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-
         {/* ── Page Header ─────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 mb-8">
           <Link
@@ -128,7 +139,6 @@ const Cart = () => {
         {/* ── Main content (items + summary) ───────────────────────────── */}
         {cartCount > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-
             {/* ─── Cart Items List ──────────────────────────────────── */}
             <div className="lg:col-span-2">
               <Loading loading={loading} error={error} skeleton={skeleton}>
@@ -149,7 +159,6 @@ const Cart = () => {
             {/* ─── Order Summary Panel ──────────────────────────────── */}
             <div className="lg:col-span-1 sticky top-6">
               <div className="bg-gray-900/60 border border-gray-800/80 rounded-2xl overflow-hidden shadow-2xl">
-
                 {/* Panel header */}
                 <div className="px-5 py-4 border-b border-gray-800/60">
                   <h2 className="font-bold text-white text-base">
@@ -161,8 +170,8 @@ const Cart = () => {
                 <div className="px-5 py-5 space-y-3 text-sm">
                   <div className="flex justify-between text-gray-400">
                     <span>
-                      Subtotal ({cartCount}{" "}
-                      {cartCount === 1 ? "item" : "items"})
+                      Subtotal ({cartCount} {cartCount === 1 ? "item" : "items"}
+                      )
                     </span>
                     <span className="font-semibold text-gray-200">
                       ${(subtotal + totalSavings).toFixed(2)}
@@ -222,7 +231,6 @@ const Cart = () => {
                 </div>
               </div>
             </div>
-
           </div>
         )}
       </div>
