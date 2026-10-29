@@ -6,6 +6,7 @@ import getCartProducts from "@/store/actions/getCartProducts";
 import { ShoppingCart, ArrowLeft, Tag, PackageX } from "lucide-react";
 import { Link } from "react-router-dom";
 import { changeQuantity, removeFromCart } from "@/store/cart/cartSlice";
+import { getFinalPrice } from "@/utils/getFinalPrice";
 
 /* ─── Skeleton for a single cart row ───────────────────────────────────── */
 const CartItemSkeleton = () => (
@@ -62,10 +63,10 @@ const handleRemoveItem = useCallback(
 
     productInfo.forEach((product) => {
       const qty = cartItems[product.id] ?? 0;
-      const price = parseFloat(product.price);
-      const saving =
-        product.discount > 0 ? (price * product.discount) / 100 : 0;
-      const finalPrice = price - saving;
+      const originalPrice = parseFloat(product.price);
+      const finalPrice = getFinalPrice(product.price, product.discount);
+      const saving = originalPrice - finalPrice;
+
       subtotal += finalPrice * qty;
       totalSavings += saving * qty;
     });

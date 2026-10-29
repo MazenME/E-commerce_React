@@ -1,16 +1,15 @@
 import { memo } from "react";
 import { Plus, Minus, Trash2 } from "lucide-react";
 import type { ICartItemProps } from "@/interfaces/interfaces";
+import { getFinalPrice } from "@/utils/getFinalPrice";
 
 const CartItem = memo(
   ({ product, quantity, changeQuantity, removeItem }: ICartItemProps) => {
     const { id, title, price, img, stock, brand, discount } = product;
 
-    const numericPrice = parseFloat(price);
+    const numericPrice = typeof price === "string" ? parseFloat(price) : price;
     const hasDiscount = discount > 0;
-    const finalPrice = hasDiscount
-      ? numericPrice - (numericPrice * discount) / 100
-      : numericPrice;
+    const finalPrice = getFinalPrice(price, discount);
 
     const itemTotal = (finalPrice * quantity).toFixed(2);
     const isMinQuantity = quantity <= 1;
@@ -28,7 +27,6 @@ const CartItem = memo(
       }
     };
 
-    console.log("rendering check")
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 bg-gray-900/50 border border-gray-800/80 hover:border-gray-700/80 rounded-2xl transition-all duration-300 shadow-lg w-full">
         {/* Left: Product Image & Details */}

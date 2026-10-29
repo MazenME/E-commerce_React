@@ -3,6 +3,7 @@ import type { TProduct } from "@/types/types";
 import { Star, ShoppingCart } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/cart/cartSlice";
+import { getFinalPrice } from "@/utils/getFinalPrice";
 
 interface ProductProps {
   product: TProduct;
@@ -55,9 +56,7 @@ const Product = memo(({ product, onAddToCart }: ProductProps) => {
 
   const numericPrice = parseFloat(price);
   const hasDiscount = discount > 0;
-  const discountedPrice = hasDiscount
-    ? numericPrice - (numericPrice * discount) / 100
-    : numericPrice;
+  const discountedPrice = getFinalPrice(price, discount);
 
   return (
     <div className="group relative flex flex-col bg-gray-900/40 hover:bg-gray-900/70 border border-gray-800 hover:border-cyan-500/30 rounded-2xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300 shadow-xl w-full">
